@@ -7,7 +7,7 @@ locals {
       zone = "${var.ibmcloud_region}-${zone + 1}"
     }
   }
-
+  deploy_timestamp = formatdate("YYYYMMDD-HHmmAA", timestamp())
   tags = [
     "provider:ibm",
     "region:${var.ibmcloud_region}"

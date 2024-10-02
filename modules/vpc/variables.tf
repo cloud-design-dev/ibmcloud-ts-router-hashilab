@@ -28,3 +28,8 @@ variable "allowed_ssh_ip" {
   type        = string
   default     = "0.0.0.0/0"
 }
+
+variable "creation_tag" {
+  description = "Tag to add to all resources created by this module"
+  type        = string
+}

@@ -5,3 +5,7 @@ output "vnic_id" {
 output "compute_instance_ip" {
   value = ibm_is_virtual_network_interface.compute.primary_ip.0.address
 }
+
+output "compute_instance_id" {
+  value = ibm_is_instance.compute.id
+}

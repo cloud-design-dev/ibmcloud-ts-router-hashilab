@@ -16,7 +16,12 @@ resource "ibm_is_vpc" "demo" {
   default_network_acl_name    = "${var.prefix}-default-acl"
   default_security_group_name = "${var.prefix}-default-sg"
   default_routing_table_name  = "${var.prefix}-default-rt"
-  tags                        = var.tags
+  tags                        = concat(var.tags, ["${var.creation_tag}"])
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 module "add_rules_to_default_vpc_security_group" {
@@ -64,7 +69,12 @@ resource "ibm_is_public_gateway" "demo" {
   resource_group = var.resource_group_id
   vpc            = ibm_is_vpc.demo.id
   zone           = local.vpc_zones[0].zone
-  tags           = concat(var.tags, ["zone:${local.vpc_zones[0].zone}"])
+  tags           = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 resource "ibm_is_subnet" "dmz_zone_1" {
@@ -73,8 +83,13 @@ resource "ibm_is_subnet" "dmz_zone_1" {
   vpc                      = ibm_is_vpc.demo.id
   zone                     = local.vpc_zones[0].zone
   total_ipv4_address_count = "32"
-  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}"])
+  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}","${var.creation_tag}"])
   public_gateway           = ibm_is_public_gateway.demo.id
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 resource "ibm_is_subnet" "services_zone_1" {
@@ -84,7 +99,12 @@ resource "ibm_is_subnet" "services_zone_1" {
   zone                     = local.vpc_zones[0].zone
   total_ipv4_address_count = "64"
   public_gateway           = ibm_is_public_gateway.demo.id
-  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}"])
+  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}","${var.creation_tag}"])
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
 
 module "hashilab_instance_security_group" {
@@ -92,7 +112,7 @@ module "hashilab_instance_security_group" {
   source                       = "terraform-ibm-modules/security-group/ibm"
   version                      = "2.6.2"
   add_ibm_cloud_internal_rules = true
-  vpc_id = ibm_is_vpc.demo.id
+  vpc_id                       = ibm_is_vpc.demo.id
   security_group_name          = "${var.prefix}-hashilab-sg"
   security_group_rules = [
     {
