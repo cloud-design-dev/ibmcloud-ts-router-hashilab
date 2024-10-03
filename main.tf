@@ -127,5 +127,5 @@ resource "ibm_is_lb_pool_member" "attachment" {
   lb             = module.load_balancer.loadbalancer_id
   pool           = element(split("/", ibm_is_lb_pool.vault.id), 1)
   port           = 8200
-  target_address = module.workload_compute[count.index].compute_instance_id
+  target_id      = module.workload_compute[count.index].compute_instance_id
 }
