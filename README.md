@@ -8,7 +8,7 @@ Use the Tailscale [Subnet Router](https://tailscale.com/kb/1019/subnets) feature
 
 Here is a hgh level overview of the solution: **Not complete**
 
-![High level overview](./hashilab.png)
+![High level overview](./images/hashilab.png)
 
 
 ## Pre-reqs
