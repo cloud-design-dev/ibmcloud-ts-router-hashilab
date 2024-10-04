@@ -83,7 +83,7 @@ resource "ibm_is_subnet" "dmz_zone_1" {
   vpc                      = ibm_is_vpc.demo.id
   zone                     = local.vpc_zones[0].zone
   total_ipv4_address_count = "32"
-  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}","${var.creation_tag}"])
+  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
   public_gateway           = ibm_is_public_gateway.demo.id
   lifecycle {
     ignore_changes = [
@@ -99,7 +99,7 @@ resource "ibm_is_subnet" "services_zone_1" {
   zone                     = local.vpc_zones[0].zone
   total_ipv4_address_count = "64"
   public_gateway           = ibm_is_public_gateway.demo.id
-  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}","${var.creation_tag}"])
+  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
   lifecycle {
     ignore_changes = [
       tags,

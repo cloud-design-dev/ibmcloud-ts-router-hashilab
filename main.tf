@@ -44,7 +44,7 @@ module "lab_vpc" {
   resource_group_id = module.resource_group.resource_group_id
   tags              = local.tags
   allowed_ssh_ip    = var.allowed_ssh_ip
-  creation_tag = "created_at:${local.deploy_timestamp}"
+  creation_tag      = "created_at:${local.deploy_timestamp}"
 }
 
 module "tailscale_compute" {
@@ -123,9 +123,9 @@ resource "ibm_is_lb_listener" "vault_api" {
 }
 
 resource "ibm_is_lb_pool_member" "attachment" {
-  count          = var.cluster_size
-  lb             = module.load_balancer.loadbalancer_id
-  pool           = element(split("/", ibm_is_lb_pool.vault.id), 1)
-  port           = 8200
-  target_id      = module.workload_compute[count.index].compute_instance_id
+  count     = var.cluster_size
+  lb        = module.load_balancer.loadbalancer_id
+  pool      = element(split("/", ibm_is_lb_pool.vault.id), 1)
+  port      = 8200
+  target_id = module.workload_compute[count.index].compute_instance_id
 }

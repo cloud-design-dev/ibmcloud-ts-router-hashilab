@@ -45,6 +45,6 @@ echo "write vault config"
 write_vault_config
 
 echo "Enabling vault on boot"
-systemctl enable vault
+systemctl enable --now vault
 
 echo "install complete"
