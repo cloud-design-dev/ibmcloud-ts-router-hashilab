@@ -63,20 +63,55 @@ module "tailscale_compute" {
   ssh_key_ids = local.ssh_key_ids
 }
 
-# module "private_dns" {
-#   source            = "./modules/pdns"
-#   prefix            = local.prefix
-#   vpc_crn           = module.lab_vpc.vpc_crn
-#   resource_group_id = module.resource_group.resource_group_id
-#   dns_zone          = var.private_dns_zone
-#   tags              = local.tags
-# }
+module "private_dns" {
+  source            = "./modules/pdns"
+  prefix            = local.prefix
+  vpc_crn           = module.lab_vpc.vpc_crn
+  resource_group_id = module.resource_group.resource_group_id
+  dns_zone          = var.private_dns_zone
+  tags              = local.tags
+}
+
+resource "ibm_iam_authorization_policy" "dns_lb_policy" {
+  subject_attributes {
+    name  = "accountId"
+    value = data.ibm_iam_account_settings.iam_account_settings.account_id
+  }
+
+  subject_attributes {
+    name  = "serviceName"
+    value = "is"
+  }
+
+  subject_attributes {
+    name  = "resourceType"
+    value = "load-balancer"
+  }
+
+  roles = ["Manager"]
+
+  resource_attributes {
+    name  = "accountId"
+    value = data.ibm_iam_account_settings.iam_account_settings.account_id
+  }
+
+  resource_attributes {
+    name  = "serviceName"
+    value = "dns-svcs"
+  }
+
+  resource_attributes {
+    name  = "serviceInstance"
+    value = module.private_dns.pdns_instance_id
+  }
+}
+
 
 module "load_balancer" {
-  #   depends_on              = [module.private_dns]
+    depends_on              = [module.private_dns]
   source = "./modules/load_balancer"
-  #   dns_instance_crn        = module.private_dns.pdns_instance_crn
-  #   dns_zone_id             = module.private_dns.pdns_zone_id
+  dns_instance_crn        = module.private_dns.pdns_instance_crn
+  dns_zone_id             = module.private_dns.pdns_zone_id
   subnet_id               = module.lab_vpc.zone1_subnet_id
   name                    = "${local.prefix}-prv-lb"
   resource_group_id       = module.resource_group.resource_group_id
