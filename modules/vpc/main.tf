@@ -65,11 +65,12 @@ module "add_rules_to_default_vpc_security_group" {
 
 
 resource "ibm_is_public_gateway" "demo" {
-  name           = "${var.prefix}-public-gateway"
+  count          = length(data.ibm_is_zones.regional.zones)
+  name           = "${var.prefix}-public-gateway-${count.index}"
   resource_group = var.resource_group_id
   vpc            = ibm_is_vpc.demo.id
-  zone           = local.vpc_zones[0].zone
-  tags           = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
+  zone           = local.vpc_zones[count.index].zone
+  tags           = concat(var.tags, ["zone:${local.vpc_zones[count.index].zone}", "${var.creation_tag}"])
   lifecycle {
     ignore_changes = [
       tags,
@@ -84,7 +85,7 @@ resource "ibm_is_subnet" "dmz_zone_1" {
   zone                     = local.vpc_zones[0].zone
   total_ipv4_address_count = "32"
   tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
-  public_gateway           = ibm_is_public_gateway.demo.id
+  public_gateway           = ibm_is_public_gateway.demo[0].id
   lifecycle {
     ignore_changes = [
       tags,
@@ -98,8 +99,23 @@ resource "ibm_is_subnet" "services_zone_1" {
   vpc                      = ibm_is_vpc.demo.id
   zone                     = local.vpc_zones[0].zone
   total_ipv4_address_count = "64"
-  public_gateway           = ibm_is_public_gateway.demo.id
+  public_gateway           = ibm_is_public_gateway.demo[0].id
   tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
+}
+
+resource "ibm_is_subnet" "services_zone_2" {
+  name                     = "${var.prefix}-services-subnet-zone-2"
+  resource_group           = var.resource_group_id
+  vpc                      = ibm_is_vpc.demo.id
+  zone                     = local.vpc_zones[1].zone
+  total_ipv4_address_count = "64"
+  public_gateway           = ibm_is_public_gateway.demo[1].id
+  tags                     = concat(var.tags, ["zone:${local.vpc_zones[1].zone}", "${var.creation_tag}"])
   lifecycle {
     ignore_changes = [
       tags,

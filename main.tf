@@ -70,6 +70,7 @@ module "private_dns" {
   resource_group_id = module.resource_group.resource_group_id
   dns_zone          = var.private_dns_zone
   tags              = local.tags
+  subnet_crns       = [module.lab_vpc.zone2_subnet_crn, module.lab_vpc.zone1_subnet_crn]
 }
 
 resource "ibm_iam_authorization_policy" "dns_lb_policy" {
@@ -108,8 +109,8 @@ resource "ibm_iam_authorization_policy" "dns_lb_policy" {
 
 
 module "load_balancer" {
-    depends_on              = [module.private_dns]
-  source = "./modules/load_balancer"
+  depends_on              = [module.private_dns]
+  source                  = "./modules/load_balancer"
   dns_instance_crn        = module.private_dns.pdns_instance_crn
   dns_zone_id             = module.private_dns.pdns_zone_id
   subnet_id               = module.lab_vpc.zone1_subnet_id

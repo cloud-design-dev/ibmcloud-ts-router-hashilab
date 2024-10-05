@@ -22,6 +22,9 @@ output "zone1_subnet_id" {
   value = ibm_is_subnet.services_zone_1.id
 }
 
+output "zone2_subnet_id" {
+  value = ibm_is_subnet.services_zone_2.id
+}
 
 output "dmz_subnet_crn" {
   value = ibm_is_subnet.dmz_zone_1.crn
@@ -29,6 +32,10 @@ output "dmz_subnet_crn" {
 
 output "zone1_subnet_crn" {
   value = ibm_is_subnet.services_zone_1.crn
+}
+
+output "zone2_subnet_crn" {
+  value = ibm_is_subnet.services_zone_2.crn
 }
 
 output "dmz_subnet_cidr" {

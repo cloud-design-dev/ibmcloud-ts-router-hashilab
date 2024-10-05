@@ -43,11 +43,3 @@ resource "ibm_dns_permitted_network" "demo" {
 #  type        = "vpc"
 #}
 
-resource "ibm_dns_resource_record" "it_tools" {
-  instance_id = ibm_resource_instance.private_dns.guid
-  zone_id     = ibm_dns_zone.demo.zone_id
-  type        = "A"
-  name        = "tools"
-  rdata       = var.workload_compute_ip
-  ttl         = 3600
-}

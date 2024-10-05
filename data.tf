@@ -7,8 +7,4 @@ data "ibm_is_ssh_key" "sshkey" {
   name  = var.existing_ssh_key
 }
 
-# just used during testing when on laptop can can't start tailscale 
-# remove when done
-#data "ibm_is_vpc" "landing_zone" {
-#  name = "ca-lz-vpc-rst"
-#}
+data "ibm_iam_account_settings" "iam_account_settings" {}
