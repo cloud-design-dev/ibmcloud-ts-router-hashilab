@@ -15,28 +15,27 @@ output "hashilab_instance_security_group" {
 }
 
 output "dmz_subnet_id" {
-  value = ibm_is_subnet.dmz_zone_1.id
+  value = ibm_is_subnet.dmz.id
 }
 
-output "zone1_subnet_id" {
-  value = ibm_is_subnet.services_zone_1.id
+output "compute_subnet_ids" {
+  value = ibm_is_subnet.compute[*].id
 }
-
 
 output "dmz_subnet_crn" {
-  value = ibm_is_subnet.dmz_zone_1.crn
+  value = ibm_is_subnet.dmz.crn
 }
 
-output "zone1_subnet_crn" {
-  value = ibm_is_subnet.services_zone_1.crn
+output "compute_subnet_crns" {
+  value = ibm_is_subnet.compute[*].crn
 }
 
 output "dmz_subnet_cidr" {
-  value = ibm_is_subnet.dmz_zone_1.ipv4_cidr_block
+  value = ibm_is_subnet.dmz.ipv4_cidr_block
 }
 
-output "zone1_subnet_cidr" {
-  value = ibm_is_subnet.services_zone_1.ipv4_cidr_block
+output "compute_subnet_cidrs" {
+  value = ibm_is_subnet.compute[*].ipv4_cidr_block
 }
 
 

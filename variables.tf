@@ -54,3 +54,7 @@ variable "cluster_size" {
   type        = number
   default     = 3
 }
+
+variable "dns_instance" {}
+# variable "dns_instance_crn" {}
+# variable "dns_instance_id" {}

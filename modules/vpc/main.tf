@@ -65,11 +65,12 @@ module "add_rules_to_default_vpc_security_group" {
 
 
 resource "ibm_is_public_gateway" "demo" {
-  name           = "${var.prefix}-public-gateway"
+  count          = length(data.ibm_is_zones.regional.zones)
+  name           = "${var.prefix}-pubgw-z${count.index + 1}"
   resource_group = var.resource_group_id
   vpc            = ibm_is_vpc.demo.id
-  zone           = local.vpc_zones[0].zone
-  tags           = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
+  zone           = local.vpc_zones[count.index].zone
+  tags           = concat(var.tags, ["zone:${local.vpc_zones[count.index].zone}", "${var.creation_tag}"])
   lifecycle {
     ignore_changes = [
       tags,
@@ -77,14 +78,14 @@ resource "ibm_is_public_gateway" "demo" {
   }
 }
 
-resource "ibm_is_subnet" "dmz_zone_1" {
-  name                     = "${var.prefix}-dmz-subnet-zone-1"
+resource "ibm_is_subnet" "dmz" {
+  name                     = "${var.prefix}-dmz-subnet-z1"
   resource_group           = var.resource_group_id
   vpc                      = ibm_is_vpc.demo.id
   zone                     = local.vpc_zones[0].zone
   total_ipv4_address_count = "32"
   tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
-  public_gateway           = ibm_is_public_gateway.demo.id
+  public_gateway           = ibm_is_public_gateway.demo[0].id
   lifecycle {
     ignore_changes = [
       tags,
@@ -92,14 +93,15 @@ resource "ibm_is_subnet" "dmz_zone_1" {
   }
 }
 
-resource "ibm_is_subnet" "services_zone_1" {
-  name                     = "${var.prefix}-services-subnet-zone-1"
+resource "ibm_is_subnet" "compute" {
+  count                    = length(data.ibm_is_zones.regional.zones)
+  name                     = "${var.prefix}-compute-subnet-z${count.index + 1}"
   resource_group           = var.resource_group_id
   vpc                      = ibm_is_vpc.demo.id
-  zone                     = local.vpc_zones[0].zone
+  zone                     = local.vpc_zones[count.index].zone
   total_ipv4_address_count = "64"
-  public_gateway           = ibm_is_public_gateway.demo.id
-  tags                     = concat(var.tags, ["zone:${local.vpc_zones[0].zone}", "${var.creation_tag}"])
+  public_gateway           = ibm_is_public_gateway.demo[count.index].id
+  tags                     = concat(var.tags, ["zone:${local.vpc_zones[count.index].zone}", "${var.creation_tag}"])
   lifecycle {
     ignore_changes = [
       tags,
@@ -108,7 +110,7 @@ resource "ibm_is_subnet" "services_zone_1" {
 }
 
 module "hashilab_instance_security_group" {
-  depends_on                   = [ibm_is_subnet.dmz_zone_1]
+  depends_on                   = [ibm_is_subnet.dmz]
   source                       = "terraform-ibm-modules/security-group/ibm"
   version                      = "2.6.2"
   add_ibm_cloud_internal_rules = true
@@ -144,7 +146,7 @@ module "hashilab_instance_security_group" {
     {
       name      = "allow-all-from-dmz"
       direction = "inbound"
-      remote    = ibm_is_subnet.dmz_zone_1.ipv4_cidr_block
+      remote    = ibm_is_subnet.dmz.ipv4_cidr_block
     },
     {
       name      = "allow-all-outbound"
